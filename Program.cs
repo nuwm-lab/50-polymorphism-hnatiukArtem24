@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace GeometryShapes
 {
-    // Структура для точки
+ 
     public struct Point
     {
         public double X;
@@ -16,7 +16,7 @@ namespace GeometryShapes
         }
     }
 
-    // Абстрактний базовий клас
+   
     public abstract class Shape
     {
         public abstract void Input();
@@ -24,7 +24,7 @@ namespace GeometryShapes
         public abstract double Area();
     }
 
-    // Клас Трикутник
+ 
     public class Triangle : Shape
     {
         protected Point[] _vertices = new Point[3];
@@ -82,7 +82,7 @@ namespace GeometryShapes
         }
     }
 
-    // Клас Опуклий чотирикутник
+
     public class ConvexQuadrilateral : Shape
     {
         protected Point[] _vertices = new Point[4];
@@ -109,7 +109,7 @@ namespace GeometryShapes
 
         public override double Area()
         {
-            // Формула "shoelace" (для послідовно введених вершин)
+           
             double sum1 = 0, sum2 = 0;
             for (int i = 0; i < 4; i++)
             {
@@ -166,7 +166,7 @@ namespace GeometryShapes
                 return;
             }
 
-            // Використання поліморфізму
+         
             shape.Input();
             shape.Display();
             Console.WriteLine($"\nПлоща фігури: {shape.Area():F2}");
