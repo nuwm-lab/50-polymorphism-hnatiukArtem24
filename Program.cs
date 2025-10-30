@@ -1,111 +1,175 @@
 using System;
-using System.Collections.Generic;
+using System.Globalization;
 
 namespace GeometryShapes
 {
-    // --- Базовий клас (абстрактний) ---
-    abstract class Shape
+    // Структура для точки
+    public struct Point
     {
-        public abstract void Input();     // Введення координат
-        public abstract void Display();   // Виведення вершин
-        public abstract double Area();    // Обчислення площі
+        public double X;
+        public double Y;
+
+        public Point(double x, double y)
+        {
+            X = x;
+            Y = y;
+        }
     }
 
-    // --- Клас для трикутника ---
-    class Triangle : Shape
+    // Абстрактний базовий клас
+    public abstract class Shape
     {
-        protected (double X, double Y)[] vertices = new (double, double)[3];
+        public abstract void Input();
+        public abstract void Display();
+        public abstract double Area();
+    }
+
+    // Клас Трикутник
+    public class Triangle : Shape
+    {
+        protected Point[] _vertices = new Point[3];
+
+        public Triangle() { }
 
         public override void Input()
         {
-            Console.WriteLine("\nВведення координат вершин трикутника:");
+            Console.WriteLine("\nВведення координат трикутника (3 вершини):");
             for (int i = 0; i < 3; i++)
             {
-                Console.Write($"Вершина {i + 1} (x y): ");
-                string[] parts = Console.ReadLine().Split();
-                vertices[i] = (double.Parse(parts[0]), double.Parse(parts[1]));
+                _vertices[i] = ReadPoint(i + 1);
             }
         }
 
         public override void Display()
         {
-            Console.WriteLine("\nВершини трикутника:");
+            Console.WriteLine("\nКоординати трикутника:");
             for (int i = 0; i < 3; i++)
-                Console.WriteLine($"A{i + 1} ({vertices[i].X}; {vertices[i].Y})");
+            {
+                Console.WriteLine($"Вершина {i + 1}: ({_vertices[i].X}; {_vertices[i].Y})");
+            }
         }
 
         public override double Area()
         {
-            // Формула площі через визначник (метод "shoelace")
             double area = 0.5 * Math.Abs(
-                vertices[0].X * (vertices[1].Y - vertices[2].Y) +
-                vertices[1].X * (vertices[2].Y - vertices[0].Y) +
-                vertices[2].X * (vertices[0].Y - vertices[1].Y)
+                _vertices[0].X * (_vertices[1].Y - _vertices[2].Y) +
+                _vertices[1].X * (_vertices[2].Y - _vertices[0].Y) +
+                _vertices[2].X * (_vertices[0].Y - _vertices[1].Y)
             );
             return area;
         }
+
+        protected Point ReadPoint(int index)
+        {
+            double x, y;
+            while (true)
+            {
+                Console.Write($"Введіть координату X{index}: ");
+                if (double.TryParse(Console.ReadLine(), NumberStyles.Float, CultureInfo.InvariantCulture, out x))
+                    break;
+                Console.WriteLine("Помилка! Введіть число.");
+            }
+
+            while (true)
+            {
+                Console.Write($"Введіть координату Y{index}: ");
+                if (double.TryParse(Console.ReadLine(), NumberStyles.Float, CultureInfo.InvariantCulture, out y))
+                    break;
+                Console.WriteLine("Помилка! Введіть число.");
+            }
+
+            return new Point(x, y);
+        }
     }
 
-    // --- Похідний клас: опуклий чотирикутник ---
-    class ConvexQuadrilateral : Triangle
+    // Клас Опуклий чотирикутник
+    public class ConvexQuadrilateral : Shape
     {
-        private (double X, double Y)[] quadVertices = new (double, double)[4];
+        protected Point[] _vertices = new Point[4];
+
+        public ConvexQuadrilateral() { }
 
         public override void Input()
         {
-            Console.WriteLine("\nВведення координат вершин опуклого чотирикутника:");
+            Console.WriteLine("\nВведення координат опуклого чотирикутника (4 вершини):");
             for (int i = 0; i < 4; i++)
             {
-                Console.Write($"Вершина {i + 1} (x y): ");
-                string[] parts = Console.ReadLine().Split();
-                quadVertices[i] = (double.Parse(parts[0]), double.Parse(parts[1]));
+                _vertices[i] = ReadPoint(i + 1);
             }
         }
 
         public override void Display()
         {
-            Console.WriteLine("\nВершини чотирикутника:");
+            Console.WriteLine("\nКоординати чотирикутника:");
             for (int i = 0; i < 4; i++)
-                Console.WriteLine($"B{i + 1} ({quadVertices[i].X}; {quadVertices[i].Y})");
+            {
+                Console.WriteLine($"Вершина {i + 1}: ({_vertices[i].X}; {_vertices[i].Y})");
+            }
         }
 
         public override double Area()
         {
-            // Площа опуклого чотирикутника через формулу "shoelace"
+            // Формула "shoelace" (для послідовно введених вершин)
             double sum1 = 0, sum2 = 0;
             for (int i = 0; i < 4; i++)
             {
                 int j = (i + 1) % 4;
-                sum1 += quadVertices[i].X * quadVertices[j].Y;
-                sum2 += quadVertices[j].X * quadVertices[i].Y;
+                sum1 += _vertices[i].X * _vertices[j].Y;
+                sum2 += _vertices[i].Y * _vertices[j].X;
             }
-            return 0.5 * Math.Abs(sum1 - sum2);
+
+            double area = 0.5 * Math.Abs(sum1 - sum2);
+            return area;
+        }
+
+        protected Point ReadPoint(int index)
+        {
+            double x, y;
+            while (true)
+            {
+                Console.Write($"Введіть координату X{index}: ");
+                if (double.TryParse(Console.ReadLine(), NumberStyles.Float, CultureInfo.InvariantCulture, out x))
+                    break;
+                Console.WriteLine("Помилка! Введіть число.");
+            }
+
+            while (true)
+            {
+                Console.Write($"Введіть координату Y{index}: ");
+                if (double.TryParse(Console.ReadLine(), NumberStyles.Float, CultureInfo.InvariantCulture, out y))
+                    break;
+                Console.WriteLine("Помилка! Введіть число.");
+            }
+
+            return new Point(x, y);
         }
     }
 
-    // --- Головна програма ---
     class Program
     {
         static void Main()
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
+            Console.WriteLine("=== Обчислення площі фігури ===");
+            Console.Write("Оберіть тип фігури (1 — трикутник, 2 — опуклий чотирикутник): ");
 
-            Console.WriteLine("=== Геометричні фігури ===");
-            Console.WriteLine("1 — Трикутник");
-            Console.WriteLine("2 — Опуклий чотирикутник");
-            Console.Write("Оберіть фігуру: ");
-            int userChoose = int.Parse(Console.ReadLine());
+            Shape shape;
 
-            Shape shape; // динамічний поліморфізм
-
-            if (userChoose == 1)
+            string? choice = Console.ReadLine();
+            if (choice == "1")
                 shape = new Triangle();
-            else
+            else if (choice == "2")
                 shape = new ConvexQuadrilateral();
+            else
+            {
+                Console.WriteLine("Невірний вибір. Завершення роботи.");
+                return;
+            }
 
+            // Використання поліморфізму
             shape.Input();
             shape.Display();
-            Console.WriteLine($"\nПлоща фігури = {shape.Area():F3}");
+            Console.WriteLine($"\nПлоща фігури: {shape.Area():F2}");
 
             Console.WriteLine("\nРоботу завершено.");
         }
