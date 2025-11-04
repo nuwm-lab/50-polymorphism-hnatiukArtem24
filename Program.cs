@@ -1,147 +1,96 @@
 using System;
-using System.Globalization;
 
-namespace GeometryShapes
+namespace SystemOfEquations
 {
- 
-    public struct Point
+    // Базовий клас: система рівнянь 2×2
+    class SystemEquation
     {
-        public double X;
-        public double Y;
+        protected double[,] a = new double[2, 2];
+        protected double[] b = new double[2];
 
-        public Point(double x, double y)
+        public virtual void Input()
         {
-            X = x;
-            Y = y;
+            Console.WriteLine("Введіть коефіцієнти для системи 2x2 (a11 a12 b1; a21 a22 b2):");
+            for (int i = 0; i < 2; i++)
+            {
+                Console.Write($"Рівняння {i + 1}: ");
+                string[] parts = Console.ReadLine().Split();
+                a[i, 0] = double.Parse(parts[0]);
+                a[i, 1] = double.Parse(parts[1]);
+                b[i] = double.Parse(parts[2]);
+            }
+        }
+
+        public virtual void Print()
+        {
+            Console.WriteLine("\nСистема рівнянь 2x2:");
+            for (int i = 0; i < 2; i++)
+                Console.WriteLine($"{a[i, 0]}*x1 + {a[i, 1]}*x2 = {b[i]}");
+        }
+
+        public virtual void CheckSolution()
+        {
+            Console.Write("Введіть вектор X (x1 x2): ");
+            string[] parts = Console.ReadLine().Split();
+            double x1 = double.Parse(parts[0]);
+            double x2 = double.Parse(parts[1]);
+
+            bool ok = true;
+            for (int i = 0; i < 2; i++)
+            {
+                double left = a[i, 0] * x1 + a[i, 1] * x2;
+                if (Math.Abs(left - b[i]) > 1e-6)
+                    ok = false;
+            }
+
+            Console.WriteLine(ok ? "✅ Вектор задовольняє систему." : "❌ Вектор не задовольняє систему.");
         }
     }
 
-   
-    public abstract class Shape
+    // Похідний клас: система рівнянь 3×3
+    class SystemEquation3x3 : SystemEquation
     {
-        public abstract void Input();
-        public abstract void Display();
-        public abstract double Area();
-    }
-
- 
-    public class Triangle : Shape
-    {
-        protected Point[] _vertices = new Point[3];
-
-        public Triangle() { }
+        private double[,] a3 = new double[3, 3];
+        private double[] b3 = new double[3];
 
         public override void Input()
         {
-            Console.WriteLine("\nВведення координат трикутника (3 вершини):");
+            Console.WriteLine("Введіть коефіцієнти для системи 3x3 (a11 a12 a13 b1; a21 a22 a23 b2; a31 a32 a33 b3):");
             for (int i = 0; i < 3; i++)
             {
-                _vertices[i] = ReadPoint(i + 1);
+                Console.Write($"Рівняння {i + 1}: ");
+                string[] parts = Console.ReadLine().Split();
+                a3[i, 0] = double.Parse(parts[0]);
+                a3[i, 1] = double.Parse(parts[1]);
+                a3[i, 2] = double.Parse(parts[2]);
+                b3[i] = double.Parse(parts[3]);
             }
         }
 
-        public override void Display()
+        public override void Print()
         {
-            Console.WriteLine("\nКоординати трикутника:");
+            Console.WriteLine("\nСистема рівнянь 3x3:");
+            for (int i = 0; i < 3; i++)
+                Console.WriteLine($"{a3[i, 0]}*x1 + {a3[i, 1]}*x2 + {a3[i, 2]}*x3 = {b3[i]}");
+        }
+
+        public override void CheckSolution()
+        {
+            Console.Write("Введіть вектор X (x1 x2 x3): ");
+            string[] parts = Console.ReadLine().Split();
+            double x1 = double.Parse(parts[0]);
+            double x2 = double.Parse(parts[1]);
+            double x3 = double.Parse(parts[2]);
+
+            bool ok = true;
             for (int i = 0; i < 3; i++)
             {
-                Console.WriteLine($"Вершина {i + 1}: ({_vertices[i].X}; {_vertices[i].Y})");
-            }
-        }
-
-        public override double Area()
-        {
-            double area = 0.5 * Math.Abs(
-                _vertices[0].X * (_vertices[1].Y - _vertices[2].Y) +
-                _vertices[1].X * (_vertices[2].Y - _vertices[0].Y) +
-                _vertices[2].X * (_vertices[0].Y - _vertices[1].Y)
-            );
-            return area;
-        }
-
-        protected Point ReadPoint(int index)
-        {
-            double x, y;
-            while (true)
-            {
-                Console.Write($"Введіть координату X{index}: ");
-                if (double.TryParse(Console.ReadLine(), NumberStyles.Float, CultureInfo.InvariantCulture, out x))
-                    break;
-                Console.WriteLine("Помилка! Введіть число.");
+                double left = a3[i, 0] * x1 + a3[i, 1] * x2 + a3[i, 2] * x3;
+                if (Math.Abs(left - b3[i]) > 1e-6)
+                    ok = false;
             }
 
-            while (true)
-            {
-                Console.Write($"Введіть координату Y{index}: ");
-                if (double.TryParse(Console.ReadLine(), NumberStyles.Float, CultureInfo.InvariantCulture, out y))
-                    break;
-                Console.WriteLine("Помилка! Введіть число.");
-            }
-
-            return new Point(x, y);
-        }
-    }
-
-
-    public class ConvexQuadrilateral : Shape
-    {
-        protected Point[] _vertices = new Point[4];
-
-        public ConvexQuadrilateral() { }
-
-        public override void Input()
-        {
-            Console.WriteLine("\nВведення координат опуклого чотирикутника (4 вершини):");
-            for (int i = 0; i < 4; i++)
-            {
-                _vertices[i] = ReadPoint(i + 1);
-            }
-        }
-
-        public override void Display()
-        {
-            Console.WriteLine("\nКоординати чотирикутника:");
-            for (int i = 0; i < 4; i++)
-            {
-                Console.WriteLine($"Вершина {i + 1}: ({_vertices[i].X}; {_vertices[i].Y})");
-            }
-        }
-
-        public override double Area()
-        {
-           
-            double sum1 = 0, sum2 = 0;
-            for (int i = 0; i < 4; i++)
-            {
-                int j = (i + 1) % 4;
-                sum1 += _vertices[i].X * _vertices[j].Y;
-                sum2 += _vertices[i].Y * _vertices[j].X;
-            }
-
-            double area = 0.5 * Math.Abs(sum1 - sum2);
-            return area;
-        }
-
-        protected Point ReadPoint(int index)
-        {
-            double x, y;
-            while (true)
-            {
-                Console.Write($"Введіть координату X{index}: ");
-                if (double.TryParse(Console.ReadLine(), NumberStyles.Float, CultureInfo.InvariantCulture, out x))
-                    break;
-                Console.WriteLine("Помилка! Введіть число.");
-            }
-
-            while (true)
-            {
-                Console.Write($"Введіть координату Y{index}: ");
-                if (double.TryParse(Console.ReadLine(), NumberStyles.Float, CultureInfo.InvariantCulture, out y))
-                    break;
-                Console.WriteLine("Помилка! Введіть число.");
-            }
-
-            return new Point(x, y);
+            Console.WriteLine(ok ? "✅ Вектор задовольняє систему." : "❌ Вектор не задовольняє систему.");
         }
     }
 
@@ -149,29 +98,25 @@ namespace GeometryShapes
     {
         static void Main()
         {
-            Console.OutputEncoding = System.Text.Encoding.UTF8;
-            Console.WriteLine("=== Обчислення площі фігури ===");
-            Console.Write("Оберіть тип фігури (1 — трикутник, 2 — опуклий чотирикутник): ");
+            Console.WriteLine("Оберіть тип системи:");
+            Console.WriteLine("1 – Система рівнянь 2x2");
+            Console.WriteLine("2 – Система рівнянь 3x3");
+            Console.Write("Ваш вибір: ");
+            int userChoose = int.Parse(Console.ReadLine());
 
-            Shape shape;
+            // Динамічне створення об’єкта через базовий покажчик
+            SystemEquation system;
 
-            string? choice = Console.ReadLine();
-            if (choice == "1")
-                shape = new Triangle();
-            else if (choice == "2")
-                shape = new ConvexQuadrilateral();
+            if (userChoose == 1)
+                system = new SystemEquation();
             else
-            {
-                Console.WriteLine("Невірний вибір. Завершення роботи.");
-                return;
-            }
+                system = new SystemEquation3x3();
 
-         
-            shape.Input();
-            shape.Display();
-            Console.WriteLine($"\nПлоща фігури: {shape.Area():F2}");
+            system.Input();
+            system.Print();
+            system.CheckSolution();
 
-            Console.WriteLine("\nРоботу завершено.");
+            Console.WriteLine("\nРоботу завершено!");
         }
     }
 }
