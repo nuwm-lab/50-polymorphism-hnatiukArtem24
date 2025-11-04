@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace LabWork.Geometry
 {
-    // 🔹 Абстрактний базовий клас — система рівнянь
+   
     abstract class LinearSystem
     {
         public abstract void Input();
@@ -11,7 +11,7 @@ namespace LabWork.Geometry
         public abstract void CheckSolution();
     }
 
-    // 🔹 Клас для системи 2×2
+
     class System2x2 : LinearSystem
     {
         private double[,] _a = new double[2, 2];
@@ -78,7 +78,7 @@ namespace LabWork.Geometry
         }
     }
 
-    // 🔹 Клас для системи 3×3
+
     class System3x3 : LinearSystem
     {
         private double[,] _a = new double[3, 3];
@@ -146,7 +146,7 @@ namespace LabWork.Geometry
         }
     }
 
-    // 🔹 Головний клас програми
+
     class Program
     {
         static void Main()
@@ -164,14 +164,14 @@ namespace LabWork.Geometry
                 Console.Write("❌ Невірний вибір! Введіть 1 або 2: ");
             }
 
-            // Динамічне створення об’єкта через базовий тип
+      
             LinearSystem system = (userChoose == 1) ? new System2x2() : new System3x3();
 
             system.Input();
             system.Print();
             system.CheckSolution();
 
-            // Демонстрація поліморфізму — список базового типу
+      
             Console.WriteLine("\n=== Демонстрація поліморфізму ===");
             List<LinearSystem> systems = new List<LinearSystem>
             {
